@@ -31,13 +31,10 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<UserSignupResponse> login(
-            @RequestParam(required = false) String studentId,
             @RequestParam(required = false) String email) {
 
         MemberEntity member;
-        if (studentId != null) {
-            member = userService.findByStudentId(studentId);
-        } else if (email != null) {
+        if (email != null) {
             member = userService.findByEmail(email);
         } else {
             throw new RuntimeException("studentId or email is required");
@@ -45,7 +42,7 @@ public class UserController {
 
         UserSignupResponse response = UserSignupResponse.builder()
                 .uuid(member.getUuid())
-                .studentId(member.getStudentId())
+                .nickname(member.getNickname())
                 .name(member.getName())
                 .email(member.getEmail())
                 .level(member.getLevel().getValue())

@@ -20,8 +20,8 @@ public class MemberEntity {
     @Column(name = "uuid")
     private Integer uuid;
 
-    @Column(name = "student_id", nullable = false, length = 50)
-    private String studentId;
+    @Column(name = "nickname", nullable = false, length = 50)
+    private String nickname;
 
     @Column(name = "password", length = 50)
     private String password;

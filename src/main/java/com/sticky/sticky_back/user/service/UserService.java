@@ -24,7 +24,7 @@ public class UserService {
     public UserSignupResponse signup(UserSignupRequest request) {
         // Entity 생성
         MemberEntity member = MemberEntity.builder()
-                .studentId(request.getStudentId())
+                .nickname(request.getNickname())
                 .email(request.getEmail())
                 .password(request.getPassword())
                 .name(request.getName())
@@ -39,20 +39,12 @@ public class UserService {
         // Response 변환
         return UserSignupResponse.builder()
                 .uuid(savedMember.getUuid())
-                .studentId(savedMember.getStudentId())
+                .nickname(savedMember.getNickname())
                 .name(savedMember.getName())
                 .email(savedMember.getEmail())
                 .level(savedMember.getLevel().getValue())
                 .rate(savedMember.getRate())
                 .build();
-    }
-
-    /**
-     * 학번으로 회원 조회
-     */
-    public MemberEntity findByStudentId(String studentId) {
-        return userRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     /**

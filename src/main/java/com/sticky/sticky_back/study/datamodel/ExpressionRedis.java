@@ -4,35 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.index.Indexed;
 
-@RedisHash("expression")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpressionRedis {
 
-    @Id
-    private String id;
-
-    @Indexed
-    private Integer reportId;
-
-    @Indexed
-    private Integer topicId2;
-
-    @Indexed
-    private Integer categoryId;
-
-    @Indexed
     private Integer expressionId;
-
-    private String original;
-
-    private String feedback;
-
-    private String example;
+    private String english;
+    private String korean;
+    private String exampleEnglish;  // 번역 only
+    private String exampleKorean;   // 번역 only
+    private String original;        // 교정 only
+    private String feedback;        // 교정 only
+    private boolean translation;
 }

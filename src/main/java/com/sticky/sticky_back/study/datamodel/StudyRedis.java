@@ -8,6 +8,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RedisHash("study")
 @Data
 @Builder
@@ -19,10 +22,10 @@ public class StudyRedis {
     private String id;
 
     @Indexed
-    private Integer reportId;
-
-    @Indexed
     private Integer teamId;
 
-    private String contents;
+    @Builder.Default
+    private List<TopicRedis> topics = new ArrayList<>();
+
+    private GeneralRedis general;
 }

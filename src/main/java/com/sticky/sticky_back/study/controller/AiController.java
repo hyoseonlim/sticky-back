@@ -1,5 +1,7 @@
 package com.sticky.sticky_back.study.controller;
 
+import com.sticky.sticky_back.study.dto.AiExpressionResponse;
+import com.sticky.sticky_back.study.service.AiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +14,41 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AiController {
 
+    private final AiService aiService;
+
+    /**
+     * 번역 요청 (한->영 또는 영->한)
+     * POST /api/ai/translate
+     */
+    @PostMapping("/translate")
+    public ResponseEntity<AiExpressionResponse> translate(@RequestBody Map<String, Object> request) {
+        String text = (String) request.get("text");
+        Boolean korean = (Boolean) request.getOrDefault("korean", false);
+
+        AiExpressionResponse response = aiService.generateTranslation(text, korean);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 교정 요청
+     * POST /api/ai/feedback
+     */
+    @PostMapping("/feedback")
+    public ResponseEntity<AiExpressionResponse> feedback(@RequestBody Map<String, Object> request) {
+        String text = (String) request.get("text");
+
+        AiExpressionResponse response = aiService.generateFeedback(text);
+        return ResponseEntity.ok(response);
+    }
+
     /**
      * 화자 분리 스크립트 추출 (내부 API - Mock)
      * POST /api/ai/speaker-diarization
      */
     @PostMapping("/speaker-diarization")
     public ResponseEntity<?> speakerDiarization(@RequestBody Map<String, Object> request) {
-        // TODO: Mock 데이터 반환
-        // STT + 화자 분리 (더미 데이터)
+        // TODO: STT + 화자 분리 구현 필요
+        // 외부 AI 서비스 (Whisper, Pyannote 등) 연동
         return ResponseEntity.ok(Map.of(
             "speakers", List.of(
                 Map.of(
@@ -42,8 +71,8 @@ public class AiController {
      */
     @PostMapping("/grammar-correction")
     public ResponseEntity<?> grammarCorrection(@RequestBody Map<String, Object> request) {
-        // TODO: Mock 데이터 반환
-        // LLM 기반 문법 교정 (더미 데이터)
+        // TODO: 문법 교정 로직 구현
+        // OpenAI API를 활용한 문법 교정 구현 가능
         return ResponseEntity.ok(Map.of(
             "corrections", List.of(
                 Map.of(
@@ -58,28 +87,13 @@ public class AiController {
     }
 
     /**
-     * 번역 및 설명 (내부 API - Mock)
-     * POST /api/ai/translate
-     */
-    @PostMapping("/translate")
-    public ResponseEntity<?> translate(@RequestBody Map<String, Object> request) {
-        // TODO: Mock 데이터 반환
-        // AI 번역 + 문맥 설명 (더미 데이터)
-        return ResponseEntity.ok(Map.of(
-            "translated", "Translated text",
-            "explanation", "Translation explanation",
-            "examples", List.of("Example 1", "Example 2")
-        ));
-    }
-
-    /**
      * 복습 문제 자동 생성 (내부 API - Mock)
      * POST /api/ai/generate-questions
      */
     @PostMapping("/generate-questions")
     public ResponseEntity<?> generateQuestions(@RequestBody Map<String, Object> request) {
-        // TODO: Mock 데이터 반환
-        // AI 문제 생성 (더미 데이터)
+        // TODO: AI 문제 생성 로직 구현
+        // OpenAI API를 활용한 문제 생성 구현 가능
         return ResponseEntity.ok(Map.of(
             "questions", List.of(
                 Map.of(

@@ -29,3 +29,10 @@ spring:
   redis:
     host: localhost
     port: 6380
+
+# Upstage Solar AI 설정
+ai:
+  api-key: ${UPSTAGE_API_KEY:up_EF4I9It1JAdKewr1jnnRxWmULHuM5}
+  base-url: https://api.upstage.ai/v1/solar
+  model: solar-1-mini-chat
+  max-tokens: 1000

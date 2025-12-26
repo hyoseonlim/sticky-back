@@ -12,11 +12,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TopicRedis {
+public class GeneralRedis {
 
-    private Integer topicId;
-    private String category;
-    private String topic;
+    private String id;
+
+    @Builder.Default
+    private List<CorrectionRedis> corrections = new ArrayList<>();
+
+    @Builder.Default
+    private List<VocabRedis> vocabs = new ArrayList<>();
 
     @Builder.Default
     private List<ExpressionRedis> expressions = new ArrayList<>();

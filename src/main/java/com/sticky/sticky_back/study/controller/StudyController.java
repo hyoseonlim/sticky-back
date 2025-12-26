@@ -1,31 +1,129 @@
 package com.sticky.sticky_back.study.controller;
 
+import com.sticky.sticky_back.study.datamodel.CorrectionRedis;
+import com.sticky.sticky_back.study.datamodel.StudyRedis;
+import com.sticky.sticky_back.study.datamodel.VocabRedis;
 import com.sticky.sticky_back.study.dto.*;
+import com.sticky.sticky_back.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/study")
 @RequiredArgsConstructor
 public class StudyController {
 
+    private final StudyService studyService;
+
     /**
      * 스터디 세션 생성 (스터디룸 입장)
-     * POST /api/study/teams/{team_id}/{session}
+     * POST /api/study/teams/{team_id}
      */
-    @PostMapping("/teams/{teamId}/{session}")
-    public ResponseEntity<StudySessionCreateResponse> createSession(
+    @PostMapping("/teams/{teamId}")
+    public ResponseEntity<StudyEnterDto> enterStudyRoom(
             @PathVariable Integer teamId,
-            @PathVariable Integer session,
-            @RequestBody StudySessionCreateRequest request) {
-        // TODO: 구현 필요
-        // 1. 세션 존재 확인 (Redis)
-        // 2. 없으면 생성, 있으면 기존 ID 반환
-        return ResponseEntity.ok(StudySessionCreateResponse.builder()
-                .studyroomId(1)
+            @RequestParam(required = false, defaultValue = "false") Boolean isGeneral) {
+        StudyEnterDto response = studyService.getStudyRoom(teamId, isGeneral);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 스터디 데이터 조회
+     * GET /api/study/{study_id}
+     */
+    @GetMapping("/{studyId}")
+    public ResponseEntity<StudyRedis> getStudyData(@PathVariable String studyId) {
+        StudyRedis study = studyService.getStudyData(studyId);
+        return ResponseEntity.ok(study);
+    }
+
+    /**
+     * 회화 과목: 토픽 추가
+     * POST /api/study/{study_id}/topics
+     */
+    @PostMapping("/{studyId}/topics")
+    public ResponseEntity<StudyRedis> addTopics(
+            @PathVariable String studyId,
+            @RequestBody List<TopicDto> topics) {
+        StudyRedis study = studyService.addTopicToStudy(studyId, topics);
+        return ResponseEntity.ok(study);
+    }
+
+    /**
+     * 회화 과목: AI 도움 받기 (번역/교정)
+     * POST /api/study/{study_id}/ai-help
+     */
+    @PostMapping("/{studyId}/ai-help")
+    public ResponseEntity<StudyRedis> getAiHelp(
+            @PathVariable String studyId,
+            @RequestBody ExpressionToAskDto request) {
+        StudyRedis study = studyService.getAiHelpAndAdd(studyId, request);
+        return ResponseEntity.ok(study);
+    }
+
+    /**
+     * 일반 과목: 오답 추가
+     * POST /api/study/{study_id}/corrections
+     */
+    @PostMapping("/{studyId}/corrections")
+    public ResponseEntity<StudyRedis> addCorrections(
+            @PathVariable String studyId,
+            @RequestBody List<CorrectionRedis> corrections) {
+        StudyRedis study = studyService.addCorrectionsToGeneralStudy(studyId, corrections);
+        return ResponseEntity.ok(study);
+    }
+
+    /**
+     * 일반 과목: 단어 추가
+     * POST /api/study/{study_id}/vocabs
+     */
+    @PostMapping("/{studyId}/vocabs")
+    public ResponseEntity<StudyRedis> addVocabs(
+            @PathVariable String studyId,
+            @RequestBody List<VocabRedis> vocabs) {
+        StudyRedis study = studyService.addVocabsToGeneralStudy(studyId, vocabs);
+        return ResponseEntity.ok(study);
+    }
+
+    /**
+     * 일반 과목: AI 도움 받기
+     * POST /api/study/{study_id}/general/ai-help
+     */
+    @PostMapping("/{studyId}/general/ai-help")
+    public ResponseEntity<StudyRedis> getGeneralAiHelp(
+            @PathVariable String studyId,
+            @RequestBody ExpressionToAskDto request) {
+        StudyRedis study = studyService.getGeneralAiHelpAndAdd(studyId, request);
+        return ResponseEntity.ok(study);
+    }
+
+    /**
+     * 스터디 종료 (Redis → MongoDB 영구 저장)
+     * POST /api/study/{study_id}/finish
+     */
+    @PostMapping("/{studyId}/finish")
+    public ResponseEntity<SessionEndResponse> finishStudy(@PathVariable String studyId) {
+        String reportId = studyService.finishStudy(studyId);
+        return ResponseEntity.ok(SessionEndResponse.builder()
+                .sessionId(Integer.parseInt(reportId.hashCode() + ""))
+                .status("completed")
+                .reportId(reportId.hashCode())
+                .reviewGenerated(false)
                 .build());
+    }
+
+    /**
+     * 보고서 제출
+     * POST /api/study/{study_id}/submit
+     */
+    @PostMapping("/{studyId}/submit")
+    public ResponseEntity<String> submitReport(@PathVariable String studyId) {
+        String reportId = studyService.submitReport(studyId);
+        return ResponseEntity.ok(reportId);
     }
 
     /**
